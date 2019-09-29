@@ -1,15 +1,26 @@
 'use strict';
 
 const lexicalAnalyzer = require('./lexical-analyzer');
+const { showError } = require('./utils/out');
 
 const examples = [
-    `if 10 === 10:\n\tprint('Hey, this looks nice');`,
-    `def func ():\n\ta = 10\n\tb = a + 15`,
-    `for i in (0, 10):\n\tprint('iteration {}').format(i)`
+    `if 10 == 10:
+        print('Hey, this looks nice')`,
+    `def func ():
+        a = 10
+        b = a + 15`,
+    `for i in (0, 10):
+        print('iteration' + i)`
 ];
-// console.log(examples[0]);
+
 examples.forEach((example) => {
-    console.log(`INPUT:\n${example}`);
-    lexicalAnalyzer(example);
+    try {
+        lexicalAnalyzer(example);
+    } catch (err) {
+        if (err.type === 'lexical') {
+            showError(example, err);
+        } else {
+            console.error(err);
+        }
+    }
 });
-// lexicalAnalyzer(examples[0]);

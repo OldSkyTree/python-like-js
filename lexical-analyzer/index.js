@@ -4,95 +4,78 @@ const _ = require('lodash');
 
 const { printLexemeTable } = require('../utils/out');
 
-const literalReg = /[a-zA-Z]\w*/g;
-const stringReg = /['"].*['"]/g;
-const numberReg = /\b\d+\b/g;
-const operatorReg = /\+|-|%|==|=|\*|\/|\(|\)|\,|\.|\{|\}/g;
-const blockStartReg = /:\n/g;
-const blockSpaceReg = /\t+/g;
+const constants = require('./constants');
+const utils = require('./utils');
 
-const splitIntoLexemes = (code) => {
-    const strings = _(code)
-        .words(stringReg)
-        .map((string) => {
-            code = _.replace(code, string, '');
-            return {
-                text: string,
-                type: 'string'
-            };
-        })
-        .value();
+const removeComments = (lines) => lines.trim().replace(constants.comment, '');
 
-    const literals = _(code)
-        .words(literalReg)
-        .map((literal) => {
-            code = _.replace(code, literal, '');
+const determineLexeme = (lexeme) => {
+    if (utils.isDigit(lexeme[0])) {
+        if (constants.literal.test(lexeme)) {
             return {
-                text: literal,
-                type: 'literal'
+                text: lexeme,
+                type: 'литерал'
             };
-        })
-        .value();
-    
-    const numbers = _(code)
-        .words(numberReg)
-        .map((number) => {
-            code = _.replace(code, number, '');
+        } else {
+            throw 'Lexical error';
+        }
+    } else if (utils.isLetterOr_(lexeme[0])) {
+        if (constants.identifier.test(lexeme)) {
             return {
-                text: number,
-                type: 'number'
+                text: lexeme,
+                type: 'идентефикатор'
             };
-        })
-        .value();
-
-    const operators = _(code)
-        .words(operatorReg)
-        .map((operator) => {
-            code = _.replace(code, operator, '');
+        } else {
+            throw 'Lexical error';
+        }
+    } else {
+        if (constants.operator.test(lexeme)) {
             return {
-                text: operator,
-                type: 'operator'
+                text: lexeme,
+                type: 'разделитель'
             };
-        })
-        .value();
-
-    const blockStarts = _(code)
-        .words(blockStartReg)
-        .map((blockStart) => {
-            code = _.replace(code, blockStart, '');
-            return {
-                text: ':',
-                type: 'blockStart'
-            };
-        })
-        .value();
-
-    const blockSpaces = _(code)
-        .words(blockSpaceReg)
-        .map((blockSpace) => {
-            code = _.replace(code, blockSpace, '');
-            return {
-                text: `x${blockSpace.length} blockSpace`,
-                type: 'blockSpace'
-            };
-        })
-        .value();
-
-    if (_.trim(code)) {
-        throw 'Lexical error';
+        } else {
+            throw 'Lexical error';
+        }
     }
-
-    return _.concat(
-        [],
-        strings,
-        literals,
-        numbers,
-        operators,
-        blockStarts,
-        blockSpaces
-    );
 };
 
 module.exports = (code) => {
-    printLexemeTable(splitIntoLexemes(code));
+    const lexemes = [];
+    const lines = _.split(code, constants.lineSeparator);
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = removeComments(lines[i]);
+
+        let j = 0;
+        while (j < line.length) {
+            const separator = line.slice(j).match(constants.separator);
+            const index = _.isNull(separator)
+                ? line.length - 1
+                : separator.index;
+            const lexeme = line.slice(j, j + index);
+            
+            try {
+                !_.isEmpty(lexeme) && lexemes.push(determineLexeme(lexeme));
+                if (separator !== null && constants.operator.test(separator[0])) {
+                    lexemes.push(determineLexeme(separator[0]));
+                }
+            } catch (err) {
+                if (err === 'Lexical error') {
+                    throw {
+                        type: 'lexical',
+                        message: `${err}: in line ${i} at ${j}`,
+                        lineIndex: i,
+                        symIndex: j
+                    };
+                }
+                throw err;
+            }
+
+            j += _.isNull(separator)
+                ? index + 1
+                : index + separator[0].length;
+        }
+    }
+    printLexemeTable(lexemes);
 };
