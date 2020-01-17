@@ -10,14 +10,15 @@ const pointer = '\u02C5';
 
 exports.printLexemeTable = (lexemeList) => {
     const table = new Table({
-        head: ['Лексема', 'Предварительный тип'],
+        head: ['Лексема', 'Предварительный тип', 'index'],
         style: {head: ['yellow']}
     });
 
     lexemeList.forEach((lexeme) => {
         table.push([
             chalk.blue(lexeme.text),
-            chalk.green(lexeme.type)
+            chalk.green(lexeme.type),
+            chalk.magenta(lexeme.index)
         ]);
     });
 

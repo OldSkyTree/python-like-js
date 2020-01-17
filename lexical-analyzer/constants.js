@@ -9,6 +9,34 @@ const separator = new RegExp(`${simpleSeparator.source}|${lineSeparator.source}|
 const identifier = /^[a-z_]\w*$/i;
 const literal = /^\d+$/;
 
+const serviceWordTable = [
+    'and',
+    'break',
+    'continue',
+    'def',
+    'else',
+    'False',
+    'for',
+    'if',
+    'in',
+    'is',
+    'None',
+    'not',
+    'or',
+    'return',
+    'True',
+    'while',
+];
+
+const operatorTable = [
+    '==', '=', '+=', '+',
+    '-=', '-', '**=', '**',
+    '*=', '*', '//=', '//',
+    '/=', '/', '%=', '%',
+    ':', '.', ',', "'",
+    '"', '(', ')'
+];
+
 module.exports = {
     simpleSeparator,
     lineSeparator,
@@ -16,5 +44,7 @@ module.exports = {
     comment,
     separator,
     identifier,
-    literal
+    literal,
+    serviceWordTable,
+    operatorTable
 };
