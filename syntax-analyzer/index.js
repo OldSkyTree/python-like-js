@@ -103,7 +103,6 @@ module.exports = class SyntaxAnalyzer {
         }
 
         if (_.last(this._analyzerStack) === '$tab' && _.last(input).text !== '$tab') {
-            console.log('I AM HERE');
             const nextDedentIndex = this._findNextDedent();
 
             if (nextDedentIndex === -1) throw new Error('Wrong code block');

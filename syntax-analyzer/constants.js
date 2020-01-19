@@ -39,7 +39,7 @@ const decisionTable = (indentCount) => ({
         { terminals: ['*='], rules: ['*='] }
     ],
     '$<exp>': [
-        { terminals: ['$id', '$lit'], rules: ['$<value>', '$<exp_end>'].reverse() },
+        { terminals: ['$id', '$lit', 'True', 'False'], rules: ['$<value>', '$<exp_end>'].reverse() },
         { terminals: ['('], rules: ['$<brack_exp>', '$<exp_end>'].reverse() }
     ],
     '$<exp_end>': [
@@ -48,7 +48,9 @@ const decisionTable = (indentCount) => ({
     ],
     '$<value>': [
         { terminals: ['$id'], rules: ['$id'] },
-        { terminals: ['$lit'], rules: ['$lit'] }
+        { terminals: ['$lit'], rules: ['$lit'] },
+        { terminals: ['True'], rules: ['True'] },
+        { terminals: ['False'], rules: ['False'] }
     ],
     '$<oper>': [
         { terminals: ['+'], rules: ['+'] },
@@ -63,7 +65,6 @@ const decisionTable = (indentCount) => ({
         { terminals: ['<='], rules: ['<='] }
     ],
     '$<brack_exp>': [
-        { terminals: ['$id', '$lit'], rules: ['$<value>', '$<exp_end>'].reverse() },
         { terminals: ['('], rules: ['(', '$<exp>', ')'].reverse() }
     ],
     '$<cond>': [
