@@ -21,8 +21,28 @@ module.exports = class LexicalAnalyzer {
         this._standardCharacterTable = [];
     }
 
+    get serviceWordTable() {
+        return this._serviceWordTable;
+    }
+
+    get operatorTable() {
+        return this._operatorTable;
+    }
+
+    get symbolicNameTable() {
+        return this._symbolicNameTable;
+    }
+
+    get literalTable() {
+        return this._literalTable;
+    }
+
+    get standardCharacterTable() {
+        return this._standardCharacterTable;
+    }
+
     analyze() {
-        const lines = _.split(this._input, constants.lineSeparator);
+        const lines = this._getLines(this._input, constants.lineSeparator);
     
         for (let i = 0; i < lines.length; i++) {
             const line = this._prepareLine(lines[i]);
@@ -57,12 +77,32 @@ module.exports = class LexicalAnalyzer {
                     : index + separator[0].length;
             }
         }
+        this._standardCharacterTable.push({ text: '$', type: '$$', index: 0 });
+    }
+
+    _getLines(input, lineSeparator) {
+        input = input.replace(lineSeparator, '$nl');
+        const lines = [];
+        let currIndex = 0;
+
+        while(currIndex <= input.length) {
+            let index = input.indexOf('$nl', currIndex);
+            
+            if (index === -1) index = input.length - 1;
+            const line = input.split('').slice(currIndex, index + '$nl'.length).join('');
+            console.log(line);
+
+            lines.push(this._prepareLine(line));
+            currIndex = index + '$nl'.length;
+        }
+
+        return lines;
     }
 
     _prepareLine(line) {
         line = this._removeComments(line);
 
-        return line.replace(/\s{4}/g, '\t').trim();
+        return line.replace(/\s{4}|\\t/g, '$tab').trim();
     }
 
     _removeComments(line) {
@@ -74,7 +114,7 @@ module.exports = class LexicalAnalyzer {
             if (constants.literal.test(lexeme)) {
                 return {
                     text: lexeme,
-                    type: 'литерал',
+                    type: '$lit',
                     index: this._addTo('_literalTable', lexeme)
                 };
             }
@@ -85,9 +125,9 @@ module.exports = class LexicalAnalyzer {
 
                 if (index === -1) {
                     index = this._addTo('_symbolicNameTable', lexeme);
-                    type = 'идентефикатор';
+                    type = '$id';
                 } else {
-                    type = 'служебное слово';
+                    type = '$ser';
                 }
 
                 return {
@@ -100,7 +140,7 @@ module.exports = class LexicalAnalyzer {
             if (constants.operator.test(lexeme)) {
                 return {
                     text: lexeme,
-                    type: 'разделитель',
+                    type: '$sep',
                     index: _.indexOf(this._operatorTable, lexeme)
                 };
             }

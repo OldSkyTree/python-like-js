@@ -1,8 +1,8 @@
 'use strict';
 
 const simpleSeparator = /\s/;
-const lineSeparator = /\n/;
-const operator = /==|=|\+=|\+|-=|-|\*\*=|\*\*|\*=|\*|\/\/=|\/\/|\/=|\/|%=|%|:|\.|,|'|"|\(|\)/;
+const lineSeparator = /\n/g;
+const operator = /==|=|\+=|\+|-=|-|\*\*=|\*\*|\*=|\*|\/\/=|\/\/|\/=|\/|%=|%|:|\.|,|'|"|\(|\)|\$tab|\$nl/;
 const string = /^['"].*['"]$/;
 const comment = /#.*$/;
 const separator = new RegExp(`${simpleSeparator.source}|${lineSeparator.source}|${operator.source}`);
@@ -26,6 +26,7 @@ const serviceWordTable = [
     'return',
     'True',
     'while',
+    'print'
 ];
 
 const operatorTable = [
@@ -34,7 +35,8 @@ const operatorTable = [
     '*=', '*', '//=', '//',
     '/=', '/', '%=', '%',
     ':', '.', ',', "'",
-    '"', '(', ')'
+    '"', '(', ')','$tab',
+    '$nl'
 ];
 
 module.exports = {
