@@ -33,15 +33,15 @@ module.exports = class SyntaxAnalyzer {
             const lastStack = _.last(this._analyzerStack);
             const lastInput = _.last(input);
 
-            // console.log('------------Values------------');
-            // console.log('_analyzerStack:');
-            // console.log(this._analyzerStack);
-            // console.log('input:');
-            // console.log(_.map(input, 'text'));
-            // console.log('lastInput:');
-            // console.log(lastInput);
-            // console.log('lastStack:');
-            // console.log(lastStack);
+            console.log('------------Values------------');
+            console.log('_analyzerStack:');
+            console.log(this._analyzerStack);
+            console.log('input:');
+            console.log(_.map(input, 'text'));
+            console.log('lastInput:');
+            console.log(lastInput);
+            console.log('lastStack:');
+            console.log(lastStack);
 
             if (this._isTerminal(lastStack)) {
                 if (_.eq(lastStack, lastInput.text)) {

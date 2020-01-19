@@ -29,25 +29,45 @@ const decisionTable = (indentCount) => ({
         { terminals: ['#'], rules: ['$<comment>'] }
     ],
     '$<assign>': [
-        { terminals: ['$id'], rules: ['$id', '=', '$<exp>'].reverse() }
+        { terminals: ['$id'], rules: ['$id', '$<assign_oper>', '$<exp>'].reverse() }
     ],
-    '$<cond>': [
-        { terminals: ['if'], rules: ['if', '$<cond_exp>', ':', '$<code_block>'].reverse() }
+    '$<assign_oper>': [
+        { terminals: ['='], rules: ['='] },
+        { terminals: ['+='], rules: ['+='] },
+        { terminals: ['-='], rules: ['-='] },
+        { terminals: ['/='], rules: ['/='] },
+        { terminals: ['*='], rules: ['*='] }
     ],
-    '$<cond_exp>': [
-        { terminals: ['$id', '$lit'], rules: ['$<value>', '$<cond_op>', '$<value>'].reverse() }
+    '$<exp>': [
+        { terminals: ['$id', '$lit'], rules: ['$<value>', '$<exp_end>'].reverse() },
+        { terminals: ['('], rules: ['$<brack_exp>', '$<exp_end>'].reverse() }
+    ],
+    '$<exp_end>': [
+        { terminals: ['$nl', ',', ')', ':', '$'], rules: [] },
+        { terminals: ['+', '-', '*', '/', '==', '!=', '>', '>=', '<', '<='], rules: ['$<oper>', '$<exp>'].reverse() }
     ],
     '$<value>': [
         { terminals: ['$id'], rules: ['$id'] },
         { terminals: ['$lit'], rules: ['$lit'] }
     ],
-    '$<cond_op>': [
+    '$<oper>': [
+        { terminals: ['+'], rules: ['+'] },
+        { terminals: ['-'], rules: ['-'] },
+        { terminals: ['/'], rules: ['/'] },
+        { terminals: ['*'], rules: ['*'] },
         { terminals: ['=='], rules: ['=='] },
         { terminals: ['!='], rules: ['!='] },
-        { terminals: ['>='], rules: ['>='] },
-        { terminals: ['<='], rules: ['<='] },
         { terminals: ['>'], rules: ['>'] },
-        { terminals: ['<'], rules: ['<'] }
+        { terminals: ['>='], rules: ['>='] },
+        { terminals: ['<'], rules: ['<'] },
+        { terminals: ['<='], rules: ['<='] }
+    ],
+    '$<brack_exp>': [
+        { terminals: ['$id', '$lit'], rules: ['$<value>', '$<exp_end>'].reverse() },
+        { terminals: ['('], rules: ['(', '$<exp>', ')'].reverse() }
+    ],
+    '$<cond>': [
+        { terminals: ['if'], rules: ['if', '$<exp>', ':', '$<code_block>'].reverse() }
     ],
     '$<code_block>': [
         { terminals: ['$id', 'if', 'def', 'for', 'print', '#'], rules: ['$<op>'] },
@@ -57,7 +77,8 @@ const decisionTable = (indentCount) => ({
         { terminals: ['def'], rules: ['def', '$id', '(', '$<var_list>', ')', ':', '$<code_block>'].reverse() }
     ],
     '$<var_list>': [
-        { terminals: ['$id'], rules: ['$id', '$<var_list_end>'].reverse() }
+        { terminals: ['$id'], rules: ['$id', '$<var_list_end>'].reverse() },
+        { terminals: [')'], rules: [] }
     ],
     '$<var_list_end>': [
         { terminals: [','], rules: ['$<var_list*>'] },
@@ -67,13 +88,13 @@ const decisionTable = (indentCount) => ({
         { terminals: ['$id'], rules: [',', '$id', '<var_list_end>'].reverse() }
     ],
     '$<cycle>': [
-        { terminals: ['for'], rules: ['for', '$id', 'in', '(', '$<value>' ,',', '$<value>', ')', ':', '$<code_block>'].reverse() }
+        { terminals: ['for'], rules: ['for', '$id', 'in', '(', '$<exp>' ,',', '$<exp>', ')', ':', '$<code_block>'].reverse() }
     ],
     '$<comment>': [
         { terminals: ['#'], rules: ['#', '$any'].reverse() }
     ],
     '$<out>': [
-        { terminals: ['print'], rules: ['print', '(', '$<value>', ')'].reverse() }
+        { terminals: ['print'], rules: ['print', '(', '$<exp>', ')'].reverse() }
     ]
 });
 

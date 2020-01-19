@@ -5,15 +5,16 @@ const SyntaxAnalyzer = require('./syntax-analyzer');
 const { showError } = require('./utils/out');
 
 const examples = [
-`if 10 == 10:
-    print(1)`,
+`if 10*(2+39)-5 == 100: print(lol + 1)`
+// `if 10 == 10:
+//     print(1)`,
 // `def func (a):
 //     a = 10
 //     b = a + 15`,
-`for i in (0, 10):
-    print(i)
-    if i == 1:
-        print(j)`
+// `for i in (0, 10):
+//     print(i)
+//     if i == 1:
+//         print(j)`
 ];
 
 examples.forEach((example) => {
